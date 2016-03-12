@@ -1,8 +1,8 @@
 
 
 //
-// Generated on Tue Dec 16 2014 12:13:47 GMT+0100 (CET) by Charlie Robbins, Paolo Fragomeni & the Contributors (Using Codesurgeon).
-// Version 1.2.6
+// Generated on Sat Mar 12 2016 20:35:31 GMT+0100 (CET) by Charlie Robbins, Paolo Fragomeni & the Contributors (Using Codesurgeon).
+// Version 1.2.8
 //
 
 (function (exports) {
@@ -128,7 +128,7 @@ var listener = {
     }
 
     if (this.history === true) {
-      window.history.pushState({}, document.title, s);
+      window.history.replaceState({}, document.title, s);
       // Fire an onpopstate event manually since pushing does not obviously
       // trigger the pop event.
       this.fire();
@@ -171,7 +171,7 @@ var Router = exports.Router = function (routes) {
   this._insert = this.insert;
   this.insert = this.insertEx;
 
-  this.historySupport = (window.history != null ? window.history.pushState : null) != null
+  this.historySupport = (window.history != null ? window.history.replaceState : null) != null
 
   this.configure();
   this.mount(routes || {});
@@ -394,7 +394,7 @@ Router.prototype.configure = function(options) {
   for (var i = 0; i < this.methods.length; i++) {
     this._methods[this.methods[i]] = true;
   }
-  this.recurse = options.recurse || this.recurse || false;
+  this.recurse = typeof options.recurse === "undefined" ? this.recurse || false : options.recurse;
   this.async = options.async || false;
   this.delimiter = options.delimiter || "/";
   this.strict = typeof options.strict === "undefined" ? true : options.strict;
@@ -591,7 +591,7 @@ Router.prototype.traverse = function(method, path, routes, regexp, filter) {
           fns = fns.concat(next);
         }
         if (this.recurse) {
-          fns.push([ routes[r].before, routes[r].on ].filter(Boolean));
+          fns.push([ routes[r].before, routes[r][method] ].filter(Boolean));
           next.after = next.after.concat([ routes[r].after ].filter(Boolean));
           if (routes === this.routes) {
             fns.push([ routes["before"], routes["on"] ].filter(Boolean));
